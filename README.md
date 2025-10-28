@@ -1,6 +1,7 @@
 # Grid-Based Map Editor
-
 A lightweight desktop application for creating 2D game maps with a grid-based tile system, designed specifically for PlayStation 1 homebrew development.
+
+<img width="825" height="523" alt="screenshot-map-editor" src="https://github.com/user-attachments/assets/aa0de2fe-e809-4ddb-b1bd-f8d190909e1b" />
 
 ## Features
 
