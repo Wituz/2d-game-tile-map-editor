@@ -165,6 +165,7 @@ map-editor/
 - **Frontend**: React + TypeScript + HTML5 Canvas
 - **Backend**: Tauri (Rust)
 - **Build Tool**: Vite
+- **Development**: Entire application written by Claude Sonnet 4.5
 
 ## Tips
 
