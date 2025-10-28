@@ -1,0 +1,71 @@
+.toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background-color: #1a1a1a;
+  border-bottom: 2px solid #555;
+}
+
+.toolbar-button {
+  padding: 8px 16px;
+  background-color: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.toolbar-button:hover {
+  background-color: #3a3a3a;
+  border-color: #666;
+}
+
+.toolbar-button:active {
+  background-color: #1a1a1a;
+}
+
+.toolbar-button.export {
+  background-color: #2a4a2a;
+  border-color: #4a7a4a;
+}
+
+.toolbar-button.export:hover {
+  background-color: #3a5a3a;
+}
+
+.toolbar-button.import {
+  background-color: #2a3a4a;
+  border-color: #4a6a7a;
+}
+
+.toolbar-button.import:hover {
+  background-color: #3a4a5a;
+}
+
+.toolbar-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 0 8px;
+}
+
+.toolbar-color-picker label {
+  color: #fff;
+  font-size: 14px;
+}
+
+.color-input {
+  width: 50px;
+  height: 32px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #2a2a2a;
+}
+
+.color-input:hover {
+  border-color: #666;
+}

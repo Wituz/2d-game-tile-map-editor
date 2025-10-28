@@ -1,0 +1,17 @@
+{
+  "gridSize": 32,
+  "tiles": [
+    {
+      "id": "PIPE1",
+      "imagePath": "/home/strayanew/files/homebrew/smb-ps1/mario/assets/sprites/pipe1.png",
+      "imageData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAK1JREFUWIXtlcsJgDAQRCdiAZ5TgWxBHqwm1XiwoGAFnu1AD7oSNOIHTC4zEBLIhh3eBsaIyIyMKgGg6cYszfvWrgbcMJ0uXV1FH8Vqv0pgUWgzXU/0plbrj7uei1eWP8oN09p020OlMRA0P46QBEiABEjA5E5DA2AGABFJ2th7D2CLY1UYy4oqFjrhLO/SMTb7vrX7+fc/cDX7dAYufn86AyRAAiRAAiRAAjcEFucLpYlUQdPgAAAAAElFTkSuQmCC"
+    }
+  ],
+  "placedTiles": [
+    {
+      "tileId": "PIPE1",
+      "x": 6,
+      "y": 5
+    }
+  ]
+}
