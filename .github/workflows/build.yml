@@ -136,6 +136,33 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R artifacts
 
+      - name: Organize release files
+        run: |
+          mkdir -p release-files
+          # Copy macOS x86_64 files (rename to include architecture if needed)
+          if [ -d "artifacts/macos-x86_64" ]; then
+            for file in artifacts/macos-x86_64/*.dmg artifacts/macos-x86_64/**/*.dmg; do
+              [ -f "$file" ] && cp "$file" "release-files/$(basename "$file" .dmg)_x86_64.dmg"
+            done
+            for file in artifacts/macos-x86_64/*.app.tar.gz artifacts/macos-x86_64/**/*.app.tar.gz; do
+              [ -f "$file" ] && cp "$file" "release-files/$(basename "$file" .app.tar.gz)_x86_64.app.tar.gz"
+            done
+          fi
+          # Copy macOS ARM files (already have _aarch64 in name from Tauri)
+          if [ -d "artifacts/macos-aarch64" ]; then
+            find artifacts/macos-aarch64 -type f \( -name "*.dmg" -o -name "*.app.tar.gz" \) -exec cp {} release-files/ \;
+          fi
+          # Copy Linux files
+          if [ -d "artifacts/linux-x86_64" ]; then
+            find artifacts/linux-x86_64 -type f \( -name "*.deb" -o -name "*.AppImage" -o -name "*.rpm" \) -exec cp {} release-files/ \;
+          fi
+          # Copy Windows files
+          if [ -d "artifacts/windows-x86_64" ]; then
+            find artifacts/windows-x86_64 -type f \( -name "*.msi" -o -name "*.exe" \) -exec cp {} release-files/ \;
+          fi
+          echo "Release files:"
+          ls -la release-files/
+
       - name: Delete existing release if it exists
         continue-on-error: true
         run: gh release delete ${{ github.ref_name }} --yes
@@ -145,16 +172,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            artifacts/**/*.dmg
-            artifacts/**/*.app.tar.gz
-            artifacts/**/*.deb
-            artifacts/**/*.AppImage
-            artifacts/**/*.rpm
-            artifacts/**/*.msi
-            artifacts/**/*.exe
+          files: release-files/*
           draft: true
           generate_release_notes: true
-          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
