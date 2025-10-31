@@ -191,84 +191,75 @@ function App() {
 
   const detectRectangularRepetition = (
     startTile: PlacedTile,
-    tileMap: Map<string, PlacedTile>
+    tileMap: Map<string, PlacedTile>,
+    exportedPositions: Set<string>
   ): { repeatsX: number; repeatsY: number } => {
     const { tileId, x, y } = startTile;
 
-    // Find maximum horizontal repetition
-    let repeatsX = 1;
+    // Find maximum horizontal repetition in first row (only counting unexported tiles)
+    let maxRepeatsX = 1;
     while (true) {
-      const key = `${x + repeatsX},${y}`;
+      const key = `${x + maxRepeatsX},${y}`;
+      if (exportedPositions.has(key)) break;
       const nextTile = tileMap.get(key);
       if (!nextTile || nextTile.tileId !== tileId) break;
-      repeatsX++;
+      maxRepeatsX++;
     }
 
-    // Find maximum vertical repetition
-    let repeatsY = 1;
+    // Find maximum vertical repetition in first column (only counting unexported tiles)
+    let maxRepeatsY = 1;
     while (true) {
-      const key = `${x},${y + repeatsY}`;
+      const key = `${x},${y + maxRepeatsY}`;
+      if (exportedPositions.has(key)) break;
       const nextTile = tileMap.get(key);
       if (!nextTile || nextTile.tileId !== tileId) break;
-      repeatsY++;
+      maxRepeatsY++;
     }
 
-    // Verify the entire rectangle is filled with the same tile
-    for (let dy = 0; dy < repeatsY; dy++) {
-      for (let dx = 0; dx < repeatsX; dx++) {
-        const key = `${x + dx},${y + dy}`;
-        const tile = tileMap.get(key);
-        if (!tile || tile.tileId !== tileId) {
-          // Rectangle is incomplete, reduce dimensions
-          // Find the largest valid rectangle
-          let validRepeatsX = 1;
-          let validRepeatsY = 1;
+    // Try to find the largest valid rectangle by area
+    // Prioritize larger rectangles (by area) over smaller ones
+    let bestW = 1;
+    let bestH = 1;
+    let bestArea = 1;
 
-          // Check row by row
-          outerLoop: for (let row = 0; row < repeatsY; row++) {
-            for (let col = 0; col < repeatsX; col++) {
-              const testKey = `${x + col},${y + row}`;
-              const testTile = tileMap.get(testKey);
-              if (!testTile || testTile.tileId !== tileId) {
-                validRepeatsY = row;
-                validRepeatsX = col;
-                break outerLoop;
-              }
+    for (let testH = 1; testH <= maxRepeatsY; testH++) {
+      // For each height, find the maximum valid width
+      let validW = 0;
+      for (let testW = 1; testW <= maxRepeatsX; testW++) {
+        // Check if this rectangle is completely filled with matching unexported tiles
+        let isValid = true;
+        for (let dy = 0; dy < testH && isValid; dy++) {
+          for (let dx = 0; dx < testW && isValid; dx++) {
+            const key = `${x + dx},${y + dy}`;
+            if (exportedPositions.has(key)) {
+              isValid = false;
+              break;
+            }
+            const tile = tileMap.get(key);
+            if (!tile || tile.tileId !== tileId) {
+              isValid = false;
             }
           }
-
-          // If we found at least one valid row, check how wide it is
-          if (validRepeatsY === 0) {
-            // First row is incomplete, find width
-            validRepeatsX = 1;
-            while (validRepeatsX < repeatsX) {
-              const testKey = `${x + validRepeatsX},${y}`;
-              const testTile = tileMap.get(testKey);
-              if (!testTile || testTile.tileId !== tileId) break;
-              validRepeatsX++;
-            }
-            validRepeatsY = 1;
-          } else {
-            // Complete rows found, verify width
-            validRepeatsX = repeatsX;
-            for (let row = 0; row < validRepeatsY; row++) {
-              let rowWidth = 0;
-              while (rowWidth < validRepeatsX) {
-                const testKey = `${x + rowWidth},${y + row}`;
-                const testTile = tileMap.get(testKey);
-                if (!testTile || testTile.tileId !== tileId) break;
-                rowWidth++;
-              }
-              validRepeatsX = Math.min(validRepeatsX, rowWidth);
-            }
-          }
-
-          return { repeatsX: validRepeatsX, repeatsY: validRepeatsY };
         }
+
+        if (isValid) {
+          validW = testW;
+        } else {
+          // If this width failed, no need to test larger widths for this height
+          break;
+        }
+      }
+
+      // Update best rectangle if this one has larger area
+      const area = validW * testH;
+      if (area > bestArea) {
+        bestW = validW;
+        bestH = testH;
+        bestArea = area;
       }
     }
 
-    return { repeatsX, repeatsY };
+    return { repeatsX: bestW, repeatsY: bestH };
   };
 
   const handleExport = async () => {
@@ -307,7 +298,8 @@ function App() {
         // Detect rectangular repetition
         const { repeatsX, repeatsY } = detectRectangularRepetition(
           tile,
-          tileMap
+          tileMap,
+          exportedPositions
         );
 
         // Mark all positions in the rectangle as exported
